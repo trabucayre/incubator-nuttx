@@ -1,0 +1,7 @@
+name: ci-container
+runs:
+  using: 'docker'
+  image: 'docker.pkg.github.com/btashton/nuttx-build-containers/nuttx-github-ci'
+  args:
+    - "-c"
+    - ${{ inputs.run }}
