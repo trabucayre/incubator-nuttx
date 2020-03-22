@@ -42,7 +42,7 @@ jobs:
 
     strategy:
       matrix:
-        boards: [arm-01, arm-02, arm-03, arm-04, arm-05, arm-06, arm-07, arm-08, arm-09, arm-10, arm-11, arm-12, arm-13, arm-14, arm-15, mips-riscv-x86, sim]
+        boards: [arm-01, arm-02, arm-03, arm-04, arm-05, arm-06, arm-07, arm-08, arm-09, arm-10, arm-11, arm-12, arm-13, arm-14, arm-15, mips-riscv-x86, sim, xtensa]
 
     steps:
     - name: Checkout nuttx repo
@@ -68,6 +68,10 @@ jobs:
       with:
         repository: apache/incubator-nuttx-testing
         path: testing
+
+    - name: Add esp32 test
+      run: |
+        echo "/xtensa" > testing/testlist/xtensa.dat
 
     - name: Docker Login
       uses: azure/docker-login@v1
