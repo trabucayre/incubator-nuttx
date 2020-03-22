@@ -45,11 +45,18 @@ jobs:
         boards: [arm-01, arm-02, arm-03, arm-04, arm-05, arm-06, arm-07, arm-08, arm-09, arm-10, arm-11, arm-12, arm-13, arm-14, arm-15, mips-riscv-x86, sim, xtensa]
 
     steps:
+    - name: Checkout nuttx repo actions
+      uses: actions/checkout@v2
+      with:
+        path: nuttx-actions
+        fetch-depth: 1
+
     - name: Checkout nuttx repo
       uses: actions/checkout@v2
       with:
         path: nuttx
         fetch-depth: 0
+        ref: 1b4425ab5d3c2e211c3d6c277dfc063dbc63788b
 
     - name: Fetch nuttx tags
       run: |
@@ -62,6 +69,7 @@ jobs:
         repository: apache/incubator-nuttx-apps
         path: apps
         fetch-depth: 0
+        ref: 6ddf3471780712135cfb219bb548980e3dd61f25
 
     - name: Checkout testing repo
       uses: actions/checkout@v2
@@ -81,10 +89,10 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Run Pull Container
-      uses: ./nuttx/.github/actions/ci-container
+      uses: ./nuttx-actions/.github/actions/ci-container
 
     - name: Run builds
-      uses: ./nuttx/.github/actions/ci-container
+      uses: ./nuttx-actions/.github/actions/ci-container
       with:
         run: |
           cd testing
