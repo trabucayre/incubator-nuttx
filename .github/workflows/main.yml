@@ -42,7 +42,8 @@ jobs:
 
     strategy:
       matrix:
-        boards: [arm-01, arm-02, arm-03, arm-04, arm-05, arm-06, arm-07, arm-08, arm-09, arm-10, arm-11, arm-12, arm-13, arm-14, arm-15, mips-riscv-x86, sim, xtensa]
+        #boards: [arm-01, arm-02, arm-03, arm-04, arm-05, arm-06, arm-07, arm-08, arm-09, arm-10, arm-11, arm-12, arm-13, arm-14, arm-15, mips-riscv-x86, sim, xtensa]
+        boards: [xtensa]
 
     steps:
     - name: Checkout nuttx repo actions
@@ -93,8 +94,9 @@ jobs:
 
     - name: Run builds
       uses: ./nuttx-actions/.github/actions/ci-container
+      env:
+        BLOBDIR: /tools/blobs
       with:
         run: |
           cd testing
-          export BLOBDIR=/tools/blobs
           ./cibuild.sh -x testlist/${{matrix.boards}}.dat
