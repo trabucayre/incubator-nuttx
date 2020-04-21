@@ -17,20 +17,30 @@ on:
     types: [labeled]
 
 jobs:
+  debug_ctx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
   backport_pr:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.pull_request.label.name, 'backport-')
+    if: startsWith(github.event.label.name, 'backport-')
     steps:
       - name: Get Backport Branch Name
         id: backport_branch
         shell: bash
         run: |
-          LABEL=${{ github.event.pull_request.label.name }}
-          VERSION=${$LABEL#"backport-"}
+          LABEL=${{ github.event.label.name }}
+          VERSION=${LABEL#"backport-"}
           echo ::set-output name=base-branch::"releases/$VERSION"
           echo ::set-output name=branch-name::"backport/$VERSION/${{ github.event.pull_request.number }}"
       - name: Checkout PR
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
       - name: Create Branch
         uses: peter-evans/create-pull-request@v2
         with:
