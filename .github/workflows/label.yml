@@ -1,0 +1,42 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+name: Label Triggers
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  backport_pr:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.pull_request.label.name, 'backport-')
+    steps:
+      - name: Get Backport Branch Name
+        id: backport_branch
+        shell: bash
+        run: |
+          LABEL=${{ github.event.pull_request.label.name }}
+          VERSION=${$LABEL#"backport-"}
+          echo ::set-output name=base-branch::"releases/$VERSION"
+          echo ::set-output name=branch-name::"backport/$VERSION/${{ github.event.pull_request.number }}"
+      - name: Checkout PR
+        uses: actions/checkout@v2
+      - name: Create Branch
+        uses: peter-evans/create-pull-request@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base:  ${{ steps.backport_branch.outputs.base-branch }}
+          branch: ${{ steps.backport_branch.outputs.branch-name }}
+          title: '[Backport] Backport PR #${{ github.event.pull_request.number }} to ${{ steps.backport_branch.outputs.base-branch }}'
+          Body: |
+            Automated backport requests from PR  #${{ github.event.pull_request.number }} to ${{ steps.backport_branch.outputs.base-branch }}
