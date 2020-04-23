@@ -172,10 +172,49 @@ jobs:
   
       - name: Run builds
         uses: ./sources/testing/.github/actions/ci-container
-        working-directory: sources
         env:
           BLOBDIR: /tools/blobs
         with:
           run: |
-            cd testing
+            cd sources/testing
             ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat
+
+  macOS:
+    runs-on: macos-10.15
+    needs: Fetch-Source
+    strategy:
+      matrix:
+        boards: [arm-12, mips-riscv-x86-xtensa, sim]
+    steps:
+      - name: Fetch Cached Source
+        id: cache-source
+        uses: actions/cache@v1
+        with:
+          path: sources-cache
+          key: build-sources-${{ github.run_id }}
+      - name: Prevent Updating Source Cache
+        if: steps.cache-source.outputs.cache-hit == 'true'
+        run: mv sources-cache sources
+      - name: Download Source Artifact
+        if: steps.cache-source.outputs.cache-hit != 'true'
+        uses: actions/download-artifact@v1
+        with:
+          name: source-bundle
+          path: sources.tar.gz
+      - name: Extract Source Artifact
+        if: steps.cache-source.outputs.cache-hit != 'true'
+        run: tar -xf sources.tar.gz
+
+      - name: Restore cache
+        id: cache-tools
+        uses: actions/cache@v1
+        env:
+          cache-name: ${{ runner.os }}-cache-tools
+        with:
+          path: prebuilt
+          key: ${{ runner.os }}-tools-${{ hashFiles('./sources/testing/cibuild.sh') }}
+
+      - name: Run builds
+        run: |
+          cd sources/testing
+          ./cibuild.sh -i -x -G testlist/${{matrix.boards}}.dat
