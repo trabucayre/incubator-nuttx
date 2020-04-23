@@ -14,6 +14,11 @@ name: Build
 
 on:
   pull_request:
+  push:
+    branches:
+      - master
+      - 'releases/*'
+    tags:
 
 jobs:
   Linux:
@@ -25,10 +30,65 @@ jobs:
       matrix:
         boards: [arm-01, arm-02, arm-03, arm-04, arm-05, arm-06, arm-07, arm-08, arm-09, arm-10, arm-11, arm-12, arm-13, mips-riscv-x86-xtensa, sim]
     steps:
+    - name: Determine Target Branches
+      id: gittargets
+      shell: bash
+      run: |
+        TESTING_REF="master"  # Always use master for testing
+        OS_REF=""
+        APPS_REF=""
+        
+        REF=$GITHUB_REF
+        
+        # If a base ref is set this is a PR and we will want to use
+        # the base ref instead of the ref that triggered the event
+        if [ ${GITHUB_BASE_REF} ]; then
+          REF=$GITHUB_BASE_REF
+        fi
+          
+        echo "Working with ref: $REF"
+        
+        # We modify for all tags and release branches
+        if [[ $REF =~ refs/heads/releases/*|refs/tags/* ]]; then
+          if [[ $REF =~ refs/heads/* ]]
+            then
+              REF_NAME=${REF##refs/heads/}
+              echo "Working with a branch: $REF_NAME"
+            else
+              REF_NAME=${REF##refs/tags/}
+              echo "Working with a tag: $REF_NAME"
+          fi
+        
+          # Determine the repo and leave that unset to use the normal checkout behavior
+          # of using the merge commit instead of HEAD
+          case $GITHUB_REPOSITORY in
+            "apache/incubator-nuttx")
+              # OS
+              echo "Triggered by change in OS"
+              APPS_REF=$REF_NAME
+              ;;
+        
+            "apache/incubator-nuttx-apps")
+              # APPS
+              OS_REF=$REF_NAME
+              echo "Triggered by change in APPS"
+              ;;
+        
+            *)
+              echo "Trigger by change on $GITHUB_REPOSITORY. This is unexpected."
+              ;;
+          esac
+        fi
+        
+        echo ::set-output name=os_ref::$OS_REF
+        echo ::set-output name=apps_ref::$APPS_REF
+        echo ::set-output name=testing_ref::$TESTING_REF
+
     - name: Checkout nuttx repo
       uses: actions/checkout@v2
       with:
         repository: apache/incubator-nuttx
+        ref: ${{ steps.gittargets.outputs.os_ref }}
         path: nuttx
         fetch-depth: 0
 
@@ -41,6 +101,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: apache/incubator-nuttx-apps
+        ref: ${{ steps.gittargets.outputs.apps_ref }}
         path: apps
         fetch-depth: 0
 
@@ -48,6 +109,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: apache/incubator-nuttx-testing
+        ref: ${{ steps.gittargets.outputs.testing_ref }}
         path: testing
 
     - name: Docker Login

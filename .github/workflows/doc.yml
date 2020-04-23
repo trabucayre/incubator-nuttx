@@ -14,6 +14,11 @@ name: Doc
 
 on:
   pull_request:
+  push:
+    branches:
+      - master
+      - 'releases/*'
+    tags:
 
 jobs:
   docs:
