@@ -93,12 +93,6 @@ jobs:
           path: sources/nuttx
           fetch-depth: 1
   
-      - name: Fetch nuttx tags
-        working-directory: sources
-        run: |
-          cd nuttx
-          git fetch --tags
-  
       - name: Checkout apps repo
         uses: actions/checkout@v2
         with:
@@ -115,8 +109,41 @@ jobs:
           path: sources/testing
           fetch-depth: 1
 
+
+      - name: Cache Source
+        id: cache-source
+        uses: actions/cache@v1
+        with:
+          path: sources
+          key: build-sources-${{ github.run_id }}
+
+      - name: Create Source Bundle
+        run: tar -czf sources.tar.gz sources
       - name: Archive Source Bundle
         uses: actions/upload-artifact@v1
         with:
           name: source-bundle
-          path: sources
+          path: sources.tar.gz
+
+  Use-Source:
+    needs: Fetch-Source
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Source
+        id: cache-source
+        uses: actions/cache@v1
+        with:
+          path: sources-cache
+          key: build-sources-${{ github.run_id }}
+      - name: Prevent Updating Source Cache
+        if: steps.cache-source.outputs.cache-hit == 'true'
+        run: mv sources-cache sources
+      - name: Download Source Artifact
+        if: steps.cache-source.outputs.cache-hit != 'true'
+        uses: actions/download-artifact@v1
+        with:
+          name: source-bundle
+          path: sources.tar.gz
+      - name: Extract Source Artifact
+        if: steps.cache-source.outputs.cache-hit != 'true'
+        run: tar -xf sources.tar.gz
