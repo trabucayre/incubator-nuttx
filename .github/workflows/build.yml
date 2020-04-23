@@ -109,14 +109,6 @@ jobs:
           path: sources/testing
           fetch-depth: 1
 
-
-      - name: Cache Source
-        id: cache-source
-        uses: actions/cache@v1
-        with:
-          path: sources
-          key: build-sources-${{ github.run_id }}
-
       - name: Create Source Bundle
         run: tar -czf sources.tar.gz sources
       - name: Archive Source Bundle
@@ -125,7 +117,14 @@ jobs:
           name: source-bundle
           path: sources.tar.gz
 
-  Use-Source:
+      - name: Cache Source
+        id: cache-source
+        uses: actions/cache@v1
+        with:
+          path: sources
+          key: build-sources-${{ github.run_id }}
+
+  Linux:
     needs: Fetch-Source
     runs-on: ubuntu-latest
     env:
@@ -176,6 +175,7 @@ jobs:
           BLOBDIR: /tools/blobs
         with:
           run: |
+            git -C sources/nuttx fetch --tags
             cd sources/testing
             ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat
 
@@ -216,5 +216,6 @@ jobs:
 
       - name: Run Builds
         run: |
+          git -C sources/nuttx fetch --tags
           cd sources/testing
           ./cibuild.sh -i -x -G testlist/${{matrix.boards}}.dat
