@@ -150,7 +150,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: source-bundle
-          path: sources.tar.gz
+          path: ./
       - name: Extract Source Artifact
         if: steps.cache-source.outputs.cache-hit != 'true'
         run: tar -xf sources.tar.gz
@@ -200,7 +200,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: source-bundle
-          path: sources.tar.gz
+          path: ./
       - name: Extract Source Artifact
         if: steps.cache-source.outputs.cache-hit != 'true'
         run: tar -xf sources.tar.gz
