@@ -50,7 +50,7 @@ jobs:
         # If a base ref is set this is a PR and we will want to use
         # the base ref instead of the ref that triggered the event
         if [ ${GITHUB_BASE_REF} ]; then
-          REF=$GITHUB_BASE_REF
+          REF=refs/heads/$GITHUB_BASE_REF
         fi
           
         echo "Working with ref: $REF"
