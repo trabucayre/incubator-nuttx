@@ -21,6 +21,13 @@ on:
     tags:
 
 jobs:
+  debug_ctx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
   Linux:
     runs-on: ubuntu-18.04
     env:
@@ -28,7 +35,7 @@ jobs:
 
     strategy:
       matrix:
-        boards: [arm-01, arm-02, arm-03, arm-04, arm-05, arm-06, arm-07, arm-08, arm-09, arm-10, arm-11, arm-12, arm-13, mips-riscv-x86-xtensa, sim]
+        boards: [arm-01]
     steps:
     - name: Determine Target Branches
       id: gittargets
@@ -111,74 +118,3 @@ jobs:
         repository: apache/incubator-nuttx-testing
         ref: ${{ steps.gittargets.outputs.testing_ref }}
         path: testing
-
-    - name: Docker Login
-      uses: azure/docker-login@v1
-      with:
-        login-server: docker.pkg.github.com
-        username: ${GITHUB_ACTOR}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Docker Pull
-      uses: nick-invision/retry@v1
-      with:
-        timeout_minutes: 10
-        max_attempts: 3
-        retry_wait_seconds: 10
-        command: docker pull docker.pkg.github.com/apache/incubator-nuttx-testing/nuttx-ci-linux
-
-    - name: Run builds
-      uses: ./testing/.github/actions/ci-container
-      env:
-        BLOBDIR: /tools/blobs
-      with:
-        run: |
-          cd testing
-          ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat
-
-  macOS:
-    runs-on: macos-10.15
-
-    strategy:
-      matrix:
-        boards: [arm-12, mips-riscv-x86-xtensa, sim]
-
-    steps:
-    - name: Checkout nuttx repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx
-        path: nuttx
-        fetch-depth: 0
-
-    - name: Fetch nuttx tags
-      run: |
-        cd nuttx
-        git fetch --tags
-
-    - name: Checkout apps repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx-apps
-        path: apps
-        fetch-depth: 0
-
-    - name: Checkout testing repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx-testing
-        path: testing
-
-    - name: Restore cache
-      id: cache-tools
-      uses: actions/cache@v1
-      env:
-        cache-name: ${{ runner.os }}-cache-tools
-      with:
-        path: prebuilt
-        key: ${{ runner.os }}-tools-${{ hashFiles('./testing/cibuild.sh') }}
-
-    - name: Run builds
-      run: |
-        cd testing
-        ./cibuild.sh -i -x -G testlist/${{matrix.boards}}.dat
