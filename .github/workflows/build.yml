@@ -92,7 +92,9 @@ jobs:
           ref: ${{ steps.gittargets.outputs.os_ref }}
           path: sources/nuttx
           fetch-depth: 1
-  
+      - name: Fetch Tags for NuttX repo
+        run: git -C sources/nuttx fetch --tags
+
       - name: Checkout apps repo
         uses: actions/checkout@v2
         with:
@@ -175,7 +177,7 @@ jobs:
           BLOBDIR: /tools/blobs
         with:
           run: |
-            git -C sources/nuttx fetch --tags
+            #git -C sources/nuttx fetch --tags
             cd sources/testing
             ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat
 
@@ -216,6 +218,6 @@ jobs:
 
       - name: Run Builds
         run: |
-          git -C sources/nuttx fetch --tags
+          #git -C sources/nuttx fetch --tags
           cd sources/testing
           ./cibuild.sh -i -x -G testlist/${{matrix.boards}}.dat
