@@ -243,7 +243,7 @@ jobs:
         shell: bash
         run: |
           echo -n "\
-            make gcc-core gcc-g++ flex git bison byacc gperf gdb unzip awk automake-1.15 autoconf
+            make gcc-core gcc-g++ flex git bison byacc gperf gdb unzip awk automake-1.15 autoconf wget
             libmpc-devel libncurses-devel libmpfr-devel zlib-devel" > cyg-requirements
 
 # Cache is disabled here because cache breaks symlinks on Windows (https://github.com/actions/cache/issues/120)
