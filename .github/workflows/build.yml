@@ -245,24 +245,24 @@ jobs:
           echo -n "\
             make gcc-core gcc-g++ flex git bison byacc gperf gdb unzip awk automake-1.15 autoconf
             libmpc-devel libncurses-devel libmpfr-devel zlib-devel" > cyg-requirements
-      - name: Cached Cygwin
-        id: cache-cygwin
-        uses: actions/cache@v1
-        with:
-          path: C:\tools\cygwin\
-          key: cygwin-3.1.4-${{ hashFiles('cyg-requirements') }}
+#      - name: Cached Cygwin
+#        id: cache-cygwin
+#        uses: actions/cache@v1
+#        with:
+#          path: C:\tools\cygwin\
+#          key: cygwin-3.1.4-${{ hashFiles('cyg-requirements') }}
       - name: Checkout tools repo
         run: |
           git config --global core.autocrlf false  # We don't want CR to be added to the files
           git clone --depth 1 https://bitbucket.org/nuttx/tools.git sources/tools
       - name: Install cygwin base packages with chocolatey
-        if: steps.cache-cygwin.outputs.cache-hit != 'true'
+#        if: steps.cache-cygwin.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
           choco install --no-progress cygwin --version 3.1.4
           choco install cyg-get
       - name: Install NuutX Build Requirements for Cygwin
-        if: steps.cache-cygwin.outputs.cache-hit != 'true'
+#        if: steps.cache-cygwin.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
           cyg-get (Get-Content cyg-requirements)
