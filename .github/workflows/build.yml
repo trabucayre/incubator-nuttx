@@ -213,12 +213,12 @@ jobs:
 #          cd sources/testing
 #          ./cibuild.sh -i -x -G testlist/${{matrix.boards}}.dat
 
-  cygwin:
+  Cygwin:
     runs-on: windows-latest
-#    needs: Fetch-Source
+    needs: Fetch-Source
     strategy:
       matrix:
-        boards: [sim] # [arm-12, mips-riscv-x86-xtensa, sim]
+        boards: [sim]
     steps:
       - name: Fetch Cached Source
         id: cache-source
@@ -238,12 +238,23 @@ jobs:
       - name: Extract Source Artifact
         if: steps.cache-source.outputs.cache-hit != 'true'
         run: tar -xf sources.tar.gz
+      
+      - name: Write Cygwin Package List  # Needed for cache key hash
+        shell: bash
+        run: |
+          echo -n "\
+            make gcc-core gcc-g++ flex git bison byacc gperf gdb unzip awk automake-1.15 autoconf
+            libmpc-devel libncurses-devel libmpfr-devel zlib-devel" > cyg-requirements
       - name: Cached Cygwin
         id: cache-cygwin
         uses: actions/cache@v1
         with:
           path: C:\tools\cygwin\
-          key: cygwin-3.1.4
+          key: cygwin-3.1.4-${{ hashFiles('cyg-requirements') }}
+      - name: Checkout tools repo
+        run: |
+          git config --global core.autocrlf false  # We don't want CR to be added to the files
+          git clone --depth 1 https://bitbucket.org/nuttx/tools.git sources/tools
       - name: Install cygwin base packages with chocolatey
         if: steps.cache-cygwin.outputs.cache-hit != 'true'
         shell: pwsh
@@ -254,18 +265,22 @@ jobs:
         if: steps.cache-cygwin.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
-          cyg-get make gcc-core gcc-g++ flex git bison byacc gperf gdb unzip libmpc-devel automake-1.15 libncurses-devel libmpfr-devel zlib-devel
-      - name: Run Cygwin
+          cyg-get (Get-Content cyg-requirements)
+      - name: Set ENV
+        run: |
+          echo '::set-env name=PATH::C:\tools\cygwin\bin;C:\tools\cygwin\usr\bin'
+
+      - name: Show Cygwin PATH
         shell: cmd
         run: |
-          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "ls sources"
+          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "echo $PATH"
       - name: Build CI Tools
         shell: cmd
         run: |
            C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && mkdir ../prebuilt && install=\"kconfig-frontends\" ./cibuild.sh -i"
-#      - name:
-#      - name: Run Builds
-#        run: |
-#          git -C sources/nuttx fetch --tags
-#          cd sources/testing
-#          ./cibuild.sh -i -x -G testlist/${{matrix.boards}}.dat
+      - name: Fetch Git Tags
+        run: |
+          git -C sources/nuttx fetch --tags
+      - name: Run Builds
+        run: |
+          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat"
