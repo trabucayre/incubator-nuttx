@@ -245,6 +245,8 @@ jobs:
           echo -n "\
             make gcc-core gcc-g++ flex git bison byacc gperf gdb unzip awk automake-1.15 autoconf
             libmpc-devel libncurses-devel libmpfr-devel zlib-devel" > cyg-requirements
+
+# Cache is disabled here because cache breaks symlinks on Windows (https://github.com/actions/cache/issues/120)
 #      - name: Cached Cygwin
 #        id: cache-cygwin
 #        uses: actions/cache@v1
@@ -270,10 +272,6 @@ jobs:
         run: |
           echo '::set-env name=PATH::C:\tools\cygwin\bin;C:\tools\cygwin\usr\bin'
 
-      - name: Show Cygwin PATH
-        shell: cmd
-        run: |
-          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "echo $PATH"
       - name: Build CI Tools
         shell: cmd
         run: |
@@ -282,6 +280,6 @@ jobs:
         run: |
           git -C sources/nuttx fetch --tags
       - name: Run Builds
+        shell: cmd
         run: |
-          #C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat"
-          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && export PATH=$PATH:`pwd`../prebuilt/kconfig-frontends/bin && ../nuttx/ -c -x -G -j 2 -e \"-Wno-cpp -Werror\" testlist/${{matrix.boards}}.dat"
+          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && export PATH=$PATH:`pwd`/../prebuilt/kconfig-frontends/bin && ../nuttx/tools/testbuild.sh -c -x -G -j 2 -e \"-Wno-cpp -Werror\" testlist/${{matrix.boards}}.dat"
