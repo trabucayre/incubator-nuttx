@@ -178,11 +178,13 @@ function distclean {
 
       if [ -d $nuttx/.git ] || [ -d $APPSDIR/.git ]; then
         if [[ -n $(git -C $nuttx status --ignored -s) ]]; then
-          git -C $nuttx status --ignored
+          #git -C $nuttx status --ignored
+          echo "Modified files found"
           fail=1
         fi
         if [[ -n $(git -C $APPSDIR status --ignored -s) ]]; then
-          git -C $APPSDIR status --ignored
+          #git -C $APPSDIR status --ignored
+          echo "Modified files found"
           fail=1
         fi
       fi
