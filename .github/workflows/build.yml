@@ -279,6 +279,11 @@ jobs:
       - name: Fetch Git Tags
         run: |
           git -C sources/nuttx fetch --tags
+      - name: Reset git repos from Linux cache
+        shell: cmd
+        run: |
+          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/nuttx && git rm --cached -r . && git reset --hard"
+          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/apps && git rm --cached -r . && git reset --hard"
       - name: Run Builds
         shell: cmd
         run: |
