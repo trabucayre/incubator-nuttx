@@ -238,11 +238,11 @@ function build {
 
   if [ -d $nuttx/.git ] || [ -d $APPSDIR/.git ]; then
     if [[ -n $(git -C $nuttx status -s) ]]; then
-      git -C $nuttx status
+      #git -C $nuttx status
       fail=1
     fi
     if [[ -n $(git -C $APPSDIR status -s) ]]; then
-      git -C $APPSDIR status
+      #git -C $APPSDIR status
       fail=1
     fi
   fi
