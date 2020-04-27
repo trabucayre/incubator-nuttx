@@ -282,4 +282,4 @@ jobs:
       - name: Run Builds
         shell: cmd
         run: |
-          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && export PATH=$PATH:`pwd`/../prebuilt/kconfig-frontends/bin && ../nuttx/tools/testbuild.sh -c -x -G -j 2 -e \"-Wno-cpp -Werror\" testlist/${{matrix.boards}}.dat"
+          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && export PATH=$PATH:`pwd`/../prebuilt/kconfig-frontends/bin:`pwd`/../prebuilt/genromfs/usr/bin && ../nuttx/tools/testbuild.sh -c -x -G -j 2 -e \"-Wno-cpp -Werror\" testlist/${{matrix.boards}}.dat"
