@@ -275,7 +275,7 @@ jobs:
       - name: Build CI Tools
         shell: cmd
         run: |
-           C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && mkdir ../prebuilt && install=\"kconfig-frontends\" ./cibuild.sh -i"
+           C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && mkdir ../prebuilt && install=\"kconfig-frontends gen-romfs\" ./cibuild.sh -i"
       - name: Fetch Git Tags
         run: |
           git -C sources/nuttx fetch --tags
