@@ -283,4 +283,5 @@ jobs:
           git -C sources/nuttx fetch --tags
       - name: Run Builds
         run: |
-          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat"
+          #C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat"
+          C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd sources/testing && export PATH=$PATH:`pwd`../prebuilt/kconfig-frontends/bin && ../nuttx/ -c -x -G -j 2 -e \"-Wno-cpp -Werror\" testlist/${{matrix.boards}}.dat"
