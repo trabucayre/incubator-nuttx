@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * arch/risc-v/src/servant/servant_memorymap.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,65 +18,28 @@
  *
  ****************************************************************************/
 
+#ifndef _ARCH_RISCV_SRC_SERVANT_SERVANT_MEMORYMAP_H
+#define _ARCH_RISCV_SRC_SERVANT_SERVANT_MEMORYMAP_H
+
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
-#include <nuttx/config.h>
-
-#include <sched.h>
-#include <debug.h>
-
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
-#include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include "hardware/servant_memorymap.h"
 
 /****************************************************************************
- * Public Functions
+ * Pre-processor Definitions
  ****************************************************************************/
 
-/****************************************************************************
- * Name: nxtask_activate
- *
- * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
+/* Idle thread stack starts from _ebss */
 
-void nxtask_activate(FAR struct tcb_s *tcb)
-{
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
-
-  /* Check if this is really a re-start */
-
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
+#ifndef __ASSEMBLY__
+#define SERVANT_IDLESTACK_BASE  (uint32_t)&_ebss
+#else
+#define SERVANT_IDLESTACK_BASE  _ebss
 #endif
 
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
-}
+#define SERVANT_IDLESTACK_SIZE (CONFIG_IDLETHREAD_STACKSIZE & ~3)
+#define SERVANT_IDLESTACK_TOP  (SERVANT_IDLESTACK_BASE + SERVANT_IDLESTACK_SIZE)
+
+#endif /* _ARCH_RISCV_SRC_SERVANT_SERVANT_MEMORYMAP_H */

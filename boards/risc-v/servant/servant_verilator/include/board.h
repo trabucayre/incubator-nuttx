@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * boards/risc-v/servant/servant_verilator/include/board.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,65 +18,51 @@
  *
  ****************************************************************************/
 
+#ifndef __BOARDS_RISCV_SERVANT_SERVANT_VERILATOR_INCLUDE_BOARD_H
+#define __BOARDS_RISCV_SERVANT_SERVANT_VERILATOR_INCLUDE_BOARD_H
+
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
 #include <nuttx/config.h>
 
-#include <sched.h>
-#include <debug.h>
-
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
-#include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
-
 /****************************************************************************
- * Public Functions
+ * Pre-processor Definitions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
- *
- * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
- *
+ * Public Types
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+#ifndef __ASSEMBLY__
+
+/****************************************************************************
+ * Public Data
+ ****************************************************************************/
+
+#undef EXTERN
+#if defined(__cplusplus)
+#define EXTERN extern "C"
+extern "C"
 {
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
-
-  /* Check if this is really a re-start */
-
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
+#else
+#define EXTERN extern
 #endif
 
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
+/****************************************************************************
+ * Public Function Prototypes
+ ****************************************************************************/
+
+/****************************************************************************
+ * Name: servant_boardinitialize
+ ****************************************************************************/
+
+void servant_boardinitialize(void);
+
+#undef EXTERN
+#if defined(__cplusplus)
 }
+#endif
+#endif /* __ASSEMBLY__ */
+#endif /* __BOARDS_RISCV_SERVANT_SERVANT_VERILATOR_INCLUDE_BOARD_H */

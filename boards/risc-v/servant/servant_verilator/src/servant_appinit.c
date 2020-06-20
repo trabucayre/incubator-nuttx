@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * boards/risc-v/servant/servant_verilator/src/servant_appinit.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,59 +24,52 @@
 
 #include <nuttx/config.h>
 
-#include <sched.h>
-#include <debug.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <syslog.h>
+#include <errno.h>
 
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
-#include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include <nuttx/board.h>
+
+#include "servant.h"
+#include "servant_verilator.h"
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
+ * Name: board_app_initialize
  *
  * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
+ *   Perform architecture specific initialization
  *
  * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
+ *   arg - The boardctl() argument is passed to the board_app_initialize()
+ *         implementation without modification.  The argument has no
+ *         meaning to NuttX; the meaning of the argument is a contract
+ *         between the board-specific initialization logic and the
+ *         matching application logic.  The value could be such things as a
+ *         mode enumeration value, a set of DIP switch switch settings, a
+ *         pointer to configuration data read from a file or serial FLASH,
+ *         or whatever you would like to do with it.  Every implementation
+ *         should accept zero/NULL as a default configuration.
  *
  * Returned Value:
- *   None
+ *   Zero (OK) is returned on success; a negated errno value is returned on
+ *   any failure to indicate the nature of the failure.
  *
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+int board_app_initialize(uintptr_t arg)
 {
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
+#ifdef CONFIG_BOARD_LATE_INITIALIZE
+  /* Board initialization already performed by board_late_initialize() */
 
-  /* Check if this is really a re-start */
+  return OK;
+#else
+  /* Perform board-specific initialization */
 
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
+  return servant_bringup();
 #endif
-
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
 }

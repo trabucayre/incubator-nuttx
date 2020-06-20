@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * boards/risc-v/servant/servant_verilator/src/servant_boot.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,59 +24,34 @@
 
 #include <nuttx/config.h>
 
-#include <sched.h>
 #include <debug.h>
 
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
-#include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include <nuttx/board.h>
+#include <arch/board/board.h>
+
+/****************************************************************************
+ * Pre-processor Definitions
+ ****************************************************************************/
+
+/****************************************************************************
+ * Private Functions
+ ****************************************************************************/
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
+ * Name: servant_boardinitialize
  *
  * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
+ *   All Servant architectures must provide the following entry point.
+ *   This entry point is called early in the initialization -- after all
+ *   memory has been configured and mapped but before any devices have been
+ *   initialized.
  *
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+void servant_boardinitialize(void)
 {
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
-
-  /* Check if this is really a re-start */
-
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
-#endif
-
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
 }

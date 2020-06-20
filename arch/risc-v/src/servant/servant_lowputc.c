@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * arch/risc-v/src/servant/servant_lowputc.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,59 +24,62 @@
 
 #include <nuttx/config.h>
 
-#include <sched.h>
-#include <debug.h>
+#include <stdint.h>
 
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
-#include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include <arch/board/board.h>
+
+#include "riscv_internal.h"
+#include "riscv_arch.h"
+
+#include "hardware/servant_memorymap.h"
+#include "servant.h"
+
+/****************************************************************************
+ * Pre-processor Definitions
+ ****************************************************************************/
+
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
+ * Name: up_lowputc
  *
  * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
+ *   Output one byte on the serial console
  *
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+void up_lowputc(char ch)
 {
+//#ifdef HAVE_SERIAL_CONSOLE
+  int cout = (ch | 0x100) << 1;
+
   irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
-
-  /* Check if this is really a re-start */
-
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
+  do
     {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
-#endif
-
-  up_unblock_task(tcb);
+      (*(volatile uint32_t *)SERVANT_UART_BASE) = cout;
+      cout >>= 1;
+      asm volatile ("nop");
+      asm volatile ("nop");
+    } while (cout);
   leave_critical_section(flags);
+
+//#endif /* HAVE_CONSOLE */
+}
+
+/****************************************************************************
+ * Name: servant_lowsetup
+ *
+ * Description:
+ *   This performs basic initialization of the UART used for the serial
+ *   console.  Its purpose is to get the console output available as soon
+ *   as possible.
+ *
+ ****************************************************************************/
+
+void servant_lowsetup(void)
+{
+  (*(volatile uint32_t *)SERVANT_UART_BASE) = 1;
 }

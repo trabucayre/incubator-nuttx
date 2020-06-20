@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * arch/risc-v/src/servant/servant_idle.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -23,60 +23,45 @@
  ****************************************************************************/
 
 #include <nuttx/config.h>
-
-#include <sched.h>
-#include <debug.h>
-
 #include <nuttx/irq.h>
-#include <nuttx/sched.h>
 #include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include <nuttx/board.h>
+#include <arch/board/board.h>
+
+#include "riscv_internal.h"
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
+ * Name: up_idle
  *
  * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
+ *   up_idle() is the logic that will be executed when their is no other
+ *   ready-to-run task.  This is processor idle time and will continue until
+ *   some interrupt occurs to cause a context switch from the idle task.
  *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
+ *   Processing in this state may be processor-specific. e.g., this is where
+ *   power management operations might be performed.
  *
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+void up_idle(void)
 {
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
-
-  /* Check if this is really a re-start */
-
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
+#if defined(CONFIG_SUPPRESS_INTERRUPTS) || defined(CONFIG_SUPPRESS_TIMER_INTS)
+  /* If the system is idle and there are no timer interrupts, then process
+   * "fake" timer interrupts. Hopefully, something will wake up.
    */
 
-  sched_note_start(tcb);
-#endif
+  nxsched_process_timer();
+#else
 
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
+  /* This would be an appropriate place to put some MCU-specific logic to
+   * sleep in a reduced power mode until an interrupt occurs to save power
+   */
+
+  asm("WFI");
+
+#endif
 }

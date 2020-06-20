@@ -45,6 +45,13 @@ config ARCH_CHIP_GAP8
 		GreenwavesTechnologies GAP8 features a 1+8-core RI5CY DSP-like
 		processor, which originally comes from the ETH PULP platform.
 
+config ARCH_CHIP_SERVANT
+	bool "SERVANT"
+	select ARCH_RV32IM
+	---help---
+		Servant SOC is a single code RISC-V softcore processor (RV31I).
+		https://github.com/olofk/serv/
+
 endchoice
 
 config ARCH_RV32I
@@ -72,6 +79,7 @@ config ARCH_CHIP
 	default "litex"		if ARCH_CHIP_LITEX
 	default "nr5m100"	if ARCH_CHIP_NR5
 	default "gap8"		if ARCH_CHIP_GAP8
+	default "servant"   if ARCH_CHIP_SERVANT
 
 config NR5_MPU
 	bool "MPU support"
@@ -103,6 +111,9 @@ source arch/risc-v/src/nr5m100/Kconfig
 endif
 if ARCH_CHIP_GAP8
 source arch/risc-v/src/gap8/Kconfig
+endif
+if ARCH_CHIP_SERVANT
+source arch/risc-v/src/servant/Kconfig
 endif
 
 endif

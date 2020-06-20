@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * boards/risc-v/servant/servant_verilator/src/servant_bringup.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,59 +24,38 @@
 
 #include <nuttx/config.h>
 
-#include <sched.h>
-#include <debug.h>
+#include <sys/mount.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <syslog.h>
+#include <errno.h>
 
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
-#include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include <nuttx/board.h>
+#include <nuttx/input/buttons.h>
+
+#include "servant.h"
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
- *
- * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
- *
+ * Name: servant_bringup
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+int servant_bringup(void)
 {
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
+  int ret = OK;
 
-  /* Check if this is really a re-start */
+#ifdef CONFIG_FS_PROCFS
+  /* Mount the procfs file system */
 
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
+  ret = mount(NULL, "/proc", "procfs", 0, NULL);
+  if (ret < 0)
     {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
+      serr("ERROR: Failed to mount procfs at %s: %d\n", "/proc", ret);
     }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
 #endif
 
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
+  return ret;
 }

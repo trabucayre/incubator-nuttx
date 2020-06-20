@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * arch/risc-v/src/servant/servant_config.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,65 +18,32 @@
  *
  ****************************************************************************/
 
+#ifndef __ARCH_RISCV_SRC_SERVANT_SERVANT_CONFIG_H
+#define __ARCH_RISCV_SRC_SERVANT_SERVANT_CONFIG_H
+
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
 #include <nuttx/config.h>
 
-#include <sched.h>
-#include <debug.h>
-
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
-#include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include <arch/chip/chip.h>
+#include <arch/board/board.h>
 
 /****************************************************************************
- * Public Functions
+ * Pre-processor Definitions
  ****************************************************************************/
 
-/****************************************************************************
- * Name: nxtask_activate
- *
- * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
-
-void nxtask_activate(FAR struct tcb_s *tcb)
-{
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
-
-  /* Check if this is really a re-start */
-
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
+#undef HAVE_UART_DEVICE
+#if defined(CONFIG_SERVANT_UART0)
+#  define HAVE_UART_DEVICE 1
 #endif
 
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
-}
+#if defined(CONFIG_UART0_SERIAL_CONSOLE) && defined(CONFIG_SERVANT_UART0)
+#  define HAVE_SERIAL_CONSOLE 1
+#else
+#  undef CONFIG_UART0_SERIAL_CONSOLE
+#  undef HAVE_SERIAL_CONSOLE
+#endif
+
+#endif /* __ARCH_RISCV_SRC_SERVANT_SERVANT_CONFIG_H */

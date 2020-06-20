@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * arch/risc-v/src/servant/servant_clockconfig.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,59 +24,40 @@
 
 #include <nuttx/config.h>
 
-#include <sched.h>
+#include <stdint.h>
+#include <assert.h>
 #include <debug.h>
 
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
 #include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include <arch/board/board.h>
+
+#include "riscv_arch.h"
+#include "servant_clockconfig.h"
+
+/****************************************************************************
+ * Pre-processor Definitions
+ ****************************************************************************/
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
- *
- * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
- *
+ * Name: servant_get_hfclk
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+uint32_t servant_get_hfclk(void)
 {
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
+  /* fpga fabric default sys frequency */
 
-  /* Check if this is really a re-start */
+  return 16000000UL;
+}
 
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
+/****************************************************************************
+ * Name: servant_clockconfig
+ ****************************************************************************/
 
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
-#endif
-
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
+void servant_clockconfig(void)
+{
+  /* pll is set by fpga fabric */
 }

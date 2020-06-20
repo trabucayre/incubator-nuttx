@@ -1491,6 +1491,13 @@ config ARCH_BOARD_SAMV71_XULT
 	---help---
 		The port of NuttX to the Atmel SAMV71 Xplained Ultra evaluation board.
 
+config ARCH_BOARD_SERVANT_VERILATOR
+	bool "SERVANT VERILATOR"
+	depends on ARCH_CHIP_SERVANT
+	---help---
+		This is the board configuration for the default configuation of the
+		Servant SoC simulated with Verilator
+
 config ARCH_BOARD_SHENZHOU
 	bool "Shenzhou STM32F107 board"
 	depends on ARCH_CHIP_STM32F107VC
@@ -2311,6 +2318,7 @@ config ARCH_BOARD
 	default "sim"                      if ARCH_BOARD_SIM
 	default "moxa"                     if ARCH_BOARD_MOXA
 	default "spresense"                if ARCH_BOARD_SPRESENSE
+	default "servant_verilator"        if ARCH_BOARD_SERVANT_VERILATOR
 
 comment "Common Board Options"
 
@@ -2907,6 +2915,9 @@ source "boards/risc-v/fe310/hifive1-revb/Kconfig"
 endif
 if ARCH_BOARD_MAIX_BIT
 source "boards/risc-v/k210/maix-bit/Kconfig"
+endif
+if ARCH_BOARD_SERVANT_VERILATOR
+source "boards/risc-v/servant/servant_verilator/Kconfig"
 endif
 if ARCH_BOARD_SIM
 source "boards/sim/sim/sim/Kconfig"

@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * arch/risc-v/src/servant/servant_clockconfig.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,65 +18,48 @@
  *
  ****************************************************************************/
 
+#ifndef __ARCH_RISCV_SRC_SERVANT_SERVANT_CLOCKCONFIG_H
+#define __ARCH_RISCV_SRC_SERVANT_SERVANT_CLOCKCONFIG_H
+
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
-#include <nuttx/config.h>
-
-#include <sched.h>
-#include <debug.h>
-
-#include <nuttx/irq.h>
-#include <nuttx/sched.h>
-#include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include "servant_memorymap.h"
 
 /****************************************************************************
- * Public Functions
+ * Pre-processor Definitions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
- *
- * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
- *
+ * Public Types
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+#ifndef __ASSEMBLY__
+
+/****************************************************************************
+ * Public Data
+ ****************************************************************************/
+
+#ifdef __cplusplus
+#define EXTERN extern "C"
+extern "C"
 {
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
-
-  /* Check if this is really a re-start */
-
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
-
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
-   */
-
-  sched_note_start(tcb);
+#else
+#define EXTERN extern
 #endif
 
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
+/****************************************************************************
+ * Public Function Prototypes
+ ****************************************************************************/
+
+EXTERN uint32_t servant_get_hfclk(void);
+EXTERN void servant_clockconfig(void);
+
+#if defined(__cplusplus)
 }
+#endif
+#undef EXTERN
+
+#endif /* __ASSEMBLY__ */
+#endif /* __ARCH_RISCV_SRC_SERVANT_SERVANT_CLOCKCONFIG_H */

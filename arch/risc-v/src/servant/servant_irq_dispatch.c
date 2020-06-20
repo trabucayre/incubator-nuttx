@@ -1,5 +1,5 @@
 /****************************************************************************
- * sched/task/task_activate.c
+ * arch/risc-v/src/servant/servant_irq_dispatch.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,59 +24,67 @@
 
 #include <nuttx/config.h>
 
-#include <sched.h>
-#include <debug.h>
+#include <stdint.h>
+#include <assert.h>
 
 #include <nuttx/irq.h>
-#include <nuttx/sched.h>
 #include <nuttx/arch.h>
-#include <nuttx/sched_note.h>
+#include <nuttx/board.h>
+#include <arch/board/board.h>
+
+#include "riscv_arch.h"
+#include "riscv_internal.h"
+
+#include "servant.h"
+
+/****************************************************************************
+ * Public Data
+ ****************************************************************************/
+
+volatile uint32_t * g_current_regs;
 
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: nxtask_activate
- *
- * Description:
- *   This function activates tasks initialized by nxtask_setup_scheduler().
- *   Without activation, a task is ineligible for execution by the
- *   scheduler.
- *
- * Input Parameters:
- *   tcb - The TCB for the task for the task (same as the nxtask_init
- *         argument).
- *
- * Returned Value:
- *   None
- *
+ * servant_dispatch_irq
  ****************************************************************************/
 
-void nxtask_activate(FAR struct tcb_s *tcb)
+void *servant_dispatch_irq(uint32_t vector, uint32_t *regs)
 {
-  irqstate_t flags = enter_critical_section();
-  //leave_critical_section(flags);
-#ifdef CONFIG_SCHED_INSTRUMENTATION
+  uint32_t  irq = (vector >> 27) | (vector & 0xf);
 
-  /* Check if this is really a re-start */
+  /* Acknowledge the interrupt */
 
-  if (tcb->task_state != TSTATE_TASK_INACTIVE)
-    {
-      /* Inform the instrumentation layer that the task
-       * has stopped
-       */
+  up_ack_irq(irq);
 
-      sched_note_stop(tcb);
-    }
-
-  /* Inform the instrumentation layer that the task
-   * has started
+#ifdef CONFIG_SUPPRESS_INTERRUPTS
+  PANIC();
+#else
+  /* Current regs non-zero indicates that we are processing an interrupt;
+   * g_current_regs is also used to manage interrupt level context switches.
+   *
+   * Nested interrupts are not supported
    */
 
-  sched_note_start(tcb);
+  DEBUGASSERT(g_current_regs == NULL);
+  g_current_regs = regs;
+
+  /* Deliver the IRQ */
+
+  irq_dispatch(irq, regs);
+
 #endif
 
-  up_unblock_task(tcb);
-  leave_critical_section(flags);
+  /* If a context switch occurred while processing the interrupt then
+   * g_current_regs may have change value.  If we return any value different
+   * from the input regs, then the lower level will know that a context
+   * switch occurred during interrupt processing.
+   */
+
+  regs = (uint32_t *)g_current_regs;
+  g_current_regs = NULL;
+
+  return regs;
 }
