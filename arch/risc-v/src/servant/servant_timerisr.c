@@ -58,6 +58,8 @@ uint32_t next_count;
 
 static int servant_timerisr(int irq, void *context, FAR void *arg)
 {
+  up_lowputc2('t');
+  up_lowputc2('\n');
   uint32_t now;
   uint32_t next;
   irqstate_t flags = enter_critical_section();

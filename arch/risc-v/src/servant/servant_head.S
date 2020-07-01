@@ -146,6 +146,18 @@ exception_common:
   lw   s0, 32*4(sp) /* restore mstatus */
   csrw mstatus, s0
 
+  /* We are forcing the mpie bit to be set here.  This is really a workaround
+   * that we should not be doing because it assumes that we got here because
+   * of an interrupt and not from a critical section that triggered a trap via
+   * ecall or something.  This is all needed because SERV does not allow reading
+   * the mpie bit from mstatus. Infact reading it causes it to be set to 0.
+   * this setting call here actually will not work unless the mpie patch is
+   * applied to SERV. See PR https://github.com/olofk/serv/pull/31 for more info.
+   */
+
+  li   s0, 0x80
+  csrs mstatus, s0
+
   lw  x3,  3*4(sp)  /* gp */
   lw  x4,  4*4(sp)  /* tp */
   lw  x5,  5*4(sp)  /* t0 */

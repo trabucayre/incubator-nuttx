@@ -61,7 +61,8 @@ void up_idle(void)
    * sleep in a reduced power mode until an interrupt occurs to save power
    */
 
-  asm("WFI");
+  //asm("WFI");
+  up_lowputc2('i');
 
 #endif
 }

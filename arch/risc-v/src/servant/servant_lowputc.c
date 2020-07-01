@@ -69,6 +69,25 @@ void up_lowputc(char ch)
 //#endif /* HAVE_CONSOLE */
 }
 
+/* This is the hack version we in a critical section and don't want to
+ * futher pollute the interrupt logic we are debugging
+ */
+
+void up_lowputc2(char ch)
+{
+  /* return; */
+
+  int cout = (ch | 0x100) << 1;
+
+  do
+    {
+      (*(volatile uint32_t *)SERVANT_UART_BASE) = cout;
+      cout >>= 1;
+      asm volatile ("nop");
+      asm volatile ("nop");
+    } while (cout);
+}
+
 /****************************************************************************
  * Name: servant_lowsetup
  *
