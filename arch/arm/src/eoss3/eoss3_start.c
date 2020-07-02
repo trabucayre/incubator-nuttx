@@ -32,6 +32,7 @@
 #include "arm_arch.h"
 #include "arm_internal.h"
 #include "nvic.h"
+#include "nuttx/irq.h"
 
 #include "eoss3.h"
 #include "eoss3_start.h"
@@ -262,12 +263,10 @@ void __start(void)
 
   /* Configure the UART so that we can get debug output as soon as possible */
 
-  /* eoss3_clockconfig(); */
+  eoss3_clockconfig();
 
   eoss3_fpuconfig();
   eoss3_lowsetup();
-
-  /* eoss3_gpioinit(); */
 
   showprogress('A');
 
@@ -343,3 +342,20 @@ void __start(void)
   for (; ; );
 #endif
 }
+
+
+#warning "PLACEHOLDER FUNCTIONS HERE!!!!"
+
+/* MOVE THIS DUMMY FUNCTION TO eoss3_timerisr.c */
+
+void up_timer_initialize(void) {}
+
+/* MOVE THESE DUMMY FUNCTION TO eoss3_serial.c */
+
+int up_putc(int ch) { return 0; }
+void arm_serialinit(void) {}
+void arm_earlyserialinit(void) {}
+
+/* MOVE THIS DUMMY FUNCTION to eoss3_clockconfig.c */
+
+void eoss3_clockconfig(void) {}

@@ -50,9 +50,10 @@
 
 /* Chip-Specific External interrupts */
 
-#define EOSS3_IRQ_EXTINT        (16) /* Vector num of first ext interrupt */
+#define EOSS3_IRQ_INTERRUPTS    (16) /* Vector num of first ext interrupt */
 
-#define NR_IRQS     EOSS3_IRQ_EXTINT /* Total number of interrupts */
+#define EOSS3_IRQ_NVECTORS      EOSS3_IRQ_INTERRUPTS
+#define NR_IRQS EOSS3_IRQ_INTERRUPTS /* Total number of interrupts */
 
 /****************************************************************************
  * Public Types

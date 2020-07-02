@@ -22,4 +22,10 @@ include $(TOPDIR)/Make.defs
 
 CSRCS = eoss3_boot.c eoss3_bringup.c
 
+ifeq ($(CONFIG_ARCH_LEDS),y)
+CSRCS += eoss3_autoleds.c
+else
+CSRCS += eoss3_userleds.c
+endif
+
 include $(TOPDIR)/boards/Board.mk
