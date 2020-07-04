@@ -82,6 +82,12 @@
 #define EOSS3_CLK_SWITCH_FOR_J_OFFSET   0x0140  /* Clock 23 Source Ctrl */
 #define EOSS3_CLK_SWITCH_FOR_G_OFFSET   0x0144  /* Clock 30 Source Ctrl */
 
+/* The AIP offsets for clocking */
+
+#define EOSS3_AIP_OSC_CTRL_0_OFFSET     0x0080  /* AIP Oscillator Control 0 */
+#define EOSS3_AIP_OSC_CTRL_1_OFFSET     0x0084  /* AIP Oscillator Control 1 */
+#define EOSS3_AIP_OSC_STA_0_OFFSET      0x00A0  /* AIP OScillator Status 0 */
+
 /* Register Addresses *******************************************************/
 
 #define EOSS3_UART_DR             (EOSS3_CLK_BASE + EOSS3_UART_DR_OFFSET)
@@ -134,6 +140,34 @@
 #define EOSS3_CLK_SWITCH_FOR_J    (EOSS3_CLK_BASE + EOSS3_CLK_SWITCH_FOR_J)
 #define EOSS3_CLK_SWITCH_FOR_G    (EOSS3_CLK_BASE + EOSS3_CLK_SWITCH_FOR_G)
 
+/* AIP Clocking Registers */
+
+#define EOSS3_AIP_OSC_CTRL_0  (EOSS3_AIP_BASE + EOSS3_AIP_OSC_CTRL_0_OFFSET)
+#define EOSS3_AIP_OSC_CTRL_1  (EOSS3_AIP_BASE + EOSS3_AIP_OSC_CTRL_1_OFFSET)
+#define EOSS3_AIP_OSC_STA_0   (EOSS3_AIP_BASE + EOSS3_AIP_OSC_STA_0_OFFSET)
+
+/* MISC_LOCK_KEY_CTRL */
+
+#define MISC_LOCK_KEY_CTRL     (0x40005310)
+
 /* Register Bitfield Definitions ********************************************/
+
+/* EOSS3_AIP_OSC_CTRL_0 Register */
+
+#define AIP_OSC_CTRL_0_EN             (1 << 0)
+#define AIP_OSC_CTRL_0_FREF16K_SEL    (1 << 1)
+
+/* EOSS3_AIP_OSC_CTRL_1 Register */
+
+#define AIP_OSC_CTRL_1_PROG_SHIFT     (0)
+#define AIP_OSC_CTRL_1_PROG_MASK      (0x1fff << AIP_OSC_CTRL_1_PROG_SHIFT)
+
+/* EOSS3_AIP_OSC_STA_0 Register */
+
+#define AIP_OSC_STA_0_LOCK            (0)
+
+/* MISC_LOCK_KEY_CTRL Register*/
+#define MISC_LOCK_KEY_CTRL_UNLOCK     (0x1acce551)
+#define MISC_LOCK_KEY_CTRL_LOCK       (0x00000000) 
 
 #endif /* __ARCH_ARM_SRC_EOSS3_HARDWARE_EOSS3_CLOCK_H */

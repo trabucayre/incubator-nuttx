@@ -33,7 +33,7 @@
 #include "chip.h"
 
 #include "eoss3.h"
-#include "hardware/eoss3.h"
+#include "hardware/eoss3_uart.h"
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -96,12 +96,26 @@ void arm_lowputc(char ch)
 void eoss3_lowsetup(void)
 {
   uint32_t lcr;
-  uint32_t cr;
 
   /* Configure the Baudrate
-   * The UART is attached to clock C11 see TM sec 36.10
+   * At this point we 9973760.0 clock on C11
+   * Lets go ahead and configure the UART Baudrate to be 115200
+   * This clocking configuration should probably be configured via
+   * board settings but we are hard coding it all for now.
+   * 
+   * 9973760.0 * (1.0/115200) = 86.57777777777778
+   * 
+   * int = 86
+   * frac = (86.57777777777778 - 86)*(2^6) = 37
+   * 
+   * act_div = 86 + 37 / 2^6 = 86.578125
+   * act_baud = 9973760.0 / 86.578125 = 115199
+   */
 
-  /* Configure word length */
+  putreg32(86, EOSS3_UART_IBRD);
+  putreg32(37, EOSS3_UART_FBRD);
+
+  /* Configure word length 8 bit */
 
   lcr = getreg32(EOSS3_UART_LCR_H);
   lcr &= ~UART_LCR_H_WLEN_MASK;

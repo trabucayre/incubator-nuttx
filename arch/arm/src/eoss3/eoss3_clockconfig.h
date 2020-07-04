@@ -17,8 +17,8 @@
  * under the License.
  ****************************************************************************/
 
-#ifndef __ARCH_ARM_SRC_EOSS3_EOSS3_LOWPUTC_H
-#define __ARCH_ARM_SRC_EOSS3_EOSS3_LOWPUTC_H
+#ifndef __ARCH_ARM_SRC_EOSS3_EOSS3_CLOCKCONFIG_H
+#define __ARCH_ARM_SRC_EOSS3_EOSS3_CLOCKCONFIG_H
 
 /****************************************************************************
  * Included Files

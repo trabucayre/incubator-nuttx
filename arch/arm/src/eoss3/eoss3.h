@@ -36,5 +36,6 @@
 
 #include "chip.h"
 #include "eoss3_lowputc.h"
+#include "eoss3_clockconfig.h"
 
 #endif /* __ARCH_ARM_SRC_EOSS3_EOSS3_H */

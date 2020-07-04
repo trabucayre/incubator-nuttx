@@ -33,6 +33,7 @@
 #include "chip.h"
 
 #include "eoss3.h"
+#include "hardware/eoss3_clock.h"
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -74,12 +75,41 @@
 
 void eoss3_clockconfig(void)
 {
+  uint32_t clk_cfg;
+  uint32_t clk_status;
+  uint8_t check_cnt;
+
+  /* Enable the OSC clock source */
+
+  clk_cfg = getreg32(EOSS3_AIP_OSC_CTRL_0);
+  clk_cfg |= AIP_OSC_CTRL_0_EN;
+  putreg32(clk_cfg, EOSS3_AIP_OSC_CTRL_0);
+
+  /* Set the frequency 79.79MHz */
+
+  clk_cfg = getreg32(EOSS3_AIP_OSC_CTRL_1);
+  clk_cfg &= ~AIP_OSC_CTRL_1_PROG_MASK;
+  clk_cfg |= 0x980 << AIP_OSC_CTRL_1_PROG_SHIFT;  /* (prog + 3) ∗ 32,768Hz */
+  putreg32(clk_cfg, EOSS3_AIP_OSC_CTRL_1);
+
+  /* Wait for the lock, we need to wait for lock twice */
+
+  for(check_cnt = 0; check_cnt < 2; check_cnt++)
+    {
+      while(~(getreg32(EOSS3_AIP_OSC_STA_0) & AIP_OSC_STA_0_LOCK));
+    }
+
+  /* First get the 
   /* Need to setup M4 peripheral clocks (UART, Timer, Watchdog)
    * CLK_SWITCH_FOR_D = 0
-   * CLK_Control_D_0 = 0x20E (divide 16)
+   * CLK_Control_D_0 = 0x20E (divide 16 [16-2=e] + enable)
    * MISC_LOCK_KEY_CTRL = 0x1acce551  (re-lock by writing any other val)
    * C11_CLK_GATE = 1
    */
 
+  putreg32(0, EOSS3_CLK_SWITCH_FOR_D);
+  putreg32((8 - 2) | (1 << 9), EOSS3_CLK_CONTROL_D_0);
+  putreg32(MISC_LOCK_KEY_CTRL_UNLOCK, MISC_LOCK_KEY_CTRL);
+  putreg32(1, EOSS3_CLK_C11_GATE);
   
 }
