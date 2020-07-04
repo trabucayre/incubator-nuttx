@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/arm/src/eoss3/chip.h
+ * arch/arm/src/eoss3/eoss3_uart.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -65,5 +65,58 @@
 #define EOSS3_ICR                 (EOSS3_UART_BASE + EOSS3_ICR_OFFSET)
 
 /* Register Bitfield Definitions ********************************************/
+
+/* EOSS3_UART_DR Register */
+
+#define UART_DR_FE                (1 << 8)
+#define UART_DR_PE                (1 << 9)
+#define UART_DR_BE                (1 << 10)
+#define UART_DR_OE                (1 << 11)
+
+
+/* EOSS3_UART_RSR_ECR Register */
+
+#define UART_RSR_ECR_FE           (1 << 0)
+#define UART_RST_ECR_PE           (1 << 1)
+#define UART_RSR_ECR_BE           (1 << 2)
+#define UART_RSR_ECR_OE           (1 << 3)
+
+/* EOSS3_UART_TFR Register */
+
+#define UART_TFR_CTS              (1 << 0)
+#define UART_TFR_DSR              (1 << 1)
+#define UART_TFR_DCD              (1 << 2)
+#define UART_TFR_BUSY             (1 << 3)
+#define UART_TFR_RXFE             (1 << 4)
+#define UART_TFR_TXFF             (1 << 5)
+#define UART_TFR_RXFF             (1 << 6)
+#define UART_TFR_TXFE             (1 << 7)
+#define UART_TFR_RI               (1 << 8)
+
+/* EOSS3_UART_LCR_H Register */
+
+#define UART_LCR_H_BRK            (1 << 0)
+#define UART_LCR_H_PEN            (1 << 1)
+#define UART_LCR_H_EPS            (1 << 2)
+#define UART_LCR_H_STP2           (1 << 3)
+#define UART_LCR_H_FEN            (1 << 4)
+#define UART_LCR_H_WLEN_SHIFT     (5)
+#define UART_LCR_H_WLEN_MASK      (0x3 << UART_LCR_H_WLEN_SHIFT)
+#define UART_LCR_H_SPS            (1 << 7)
+
+/* EOSS3_UART_CR Register */
+
+#define UART_CR_UARTEN            (1 << 0)
+#define UART_CR_SIREN             (1 << 0)
+#define UART_CR_SIRLP             (2 << 0)
+#define UART_CR_LBE               (7 << 0)
+#define UART_CR_TXE               (8 << 0)
+#define UART_CR_RXE               (9 << 0)
+#define UART_CR_DTR               (10 << 0)
+#define UART_CR_RTS               (11 << 0)
+#define UART_CR_OUT1              (12 << 0)
+#define UART_CR_OUT2              (13 << 0)
+#define UART_CR_RTSEN             (14 << 0)
+#define UART_CR_CTSEN             (15 << 0)
 
 #endif /* __ARCH_ARM_SRC_EOSS3_HARDWARE_EOSS3_UART_H */

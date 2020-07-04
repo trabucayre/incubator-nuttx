@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/arm/src/eoss3/eoss3_lowputc.c
+ * arch/arm/src/eoss3/eoss3_clockconfig.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -33,7 +33,6 @@
 #include "chip.h"
 
 #include "eoss3.h"
-#include "hardware/eoss3.h"
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -64,51 +63,23 @@
  ****************************************************************************/
 
 /****************************************************************************
- * Name: arm_lowputc
+ * Name: eoss3_clockconfig
  *
  * Description:
- *   Output one byte on the serial console
+ *   Called to initialize the EOS S3.  This does whatever setup is needed to
+ *   put the SoC in a usable state.  This includes the initialization of
+ *   clocking using the settings in board.h.
  *
  ****************************************************************************/
 
-void arm_lowputc(char ch)
+void eoss3_clockconfig(void)
 {
-  /* Wait until the TX data register is empty */
+  /* Need to setup M4 peripheral clocks (UART, Timer, Watchdog)
+   * CLK_SWITCH_FOR_D = 0
+   * CLK_Control_D_0 = 0x20E (divide 16)
+   * MISC_LOCK_KEY_CTRL = 0x1acce551  (re-lock by writing any other val)
+   * C11_CLK_GATE = 1
+   */
 
-  while ((getreg32(EOSS3_UART_TFR) & UART_TFR_BUSY) == 0);
-
-  /* Then send the character */
-
-  putreg32((uint32_t)ch, EOSS3_UART_DR);
-
-}
-
-/****************************************************************************
- * Name: eoss3_lowsetup
- *
- * Description:
- *   This performs basic initialization of the UART used for the serial
- *   console.  Its purpose is to get the console output available as soon
- *   as possible.
- *
- ****************************************************************************/
-
-void eoss3_lowsetup(void)
-{
-  uint32_t lcr;
-  uint32_t cr;
-
-  /* Configure the Baudrate
-   * The UART is attached to clock C11 see TM sec 36.10
-
-  /* Configure word length */
-
-  lcr = getreg32(EOSS3_UART_LCR_H);
-  lcr &= ~UART_LCR_H_WLEN_MASK;
-  lcr |= 0x3 << UART_LCR_H_WLEN_SHIFT;
-
-  /* Enable Hardware */
-
-  putreg32(0x3 << UART_LCR_H_WLEN_SHIFT, EOSS3_UART_CR);
-  putreg32(UART_CR_UARTEN & UART_CR_TXE, EOSS3_UART_CR);
+  
 }
