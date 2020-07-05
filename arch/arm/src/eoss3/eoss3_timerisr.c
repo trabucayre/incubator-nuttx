@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/arm/src/eoss3/eoss3_clockconfig.c
+ * arch/arm/eoss3/src/eoss3_timerisr.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,32 +24,47 @@
 #include <nuttx/config.h>
 
 #include <stdint.h>
+#include <time.h>
+#include <debug.h>
+
+#include <nuttx/arch.h>
 
 #include <arch/board/board.h>
 
+#include "nvic.h"
+#include "clock/clock.h"
 #include "arm_internal.h"
 #include "arm_arch.h"
 
 #include "chip.h"
 
-#include "eoss3.h"
-#include "hardware/eoss3_clock.h"
-
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
 
-/****************************************************************************
- * Private Types
- ****************************************************************************/
+#define EOSS3_SYSTICK_CLOCK  BOARD_CPU_FREQUENCY
+
+/* The desired timer interrupt frequency is provided by the definition
+ * CLK_TCK (see include/time.h).  CLK_TCK defines the desired number of
+ * system clock ticks per second.  That value is a user configurable setting
+ * that defaults to 100 (100 ticks per second = 10 MS interval).
+ */
+
+#define SYSTICK_RELOAD ((EOSS3_SYSTICK_CLOCK / CLK_TCK) - 1)
+
+/* The size of the reload field is 24 bits.  Verify that the reload value
+ * will fit in the reload register.
+ */
+
+#if SYSTICK_RELOAD > 0x00ffffff
+#  error SYSTICK_RELOAD exceeds the range of the RELOAD register
+#endif
 
 /****************************************************************************
  * Private Function Prototypes
  ****************************************************************************/
 
-/****************************************************************************
- * Public Data
- ****************************************************************************/
+static int eoss3_timerisr(int irq, uint32_t *regs, void *arg);
 
 /****************************************************************************
  * Private Data
@@ -60,66 +75,55 @@
  ****************************************************************************/
 
 /****************************************************************************
+ * Function:  eoss3_timerisr
+ *
+ * Description:
+ *   The timer ISR will perform a variety of services for various portions
+ *   of the systems.
+ *
+ ****************************************************************************/
+
+static int eoss3_timerisr(int irq, uint32_t *regs, void *arg)
+{
+  /* Process timer interrupt */
+
+  nxsched_process_timer();
+  return 0;
+}
+
+/****************************************************************************
  * Public Functions
  ****************************************************************************/
 
 /****************************************************************************
- * Name: eoss3_clockconfig
+ * Function:  up_timer_initialize
  *
  * Description:
- *   Called to initialize the EOS S3.  This does whatever setup is needed to
- *   put the SoC in a usable state.  This includes the initialization of
- *   clocking using the settings in board.h.
+ *   This function is called during start-up to initialize the timer
+ *   interrupt.
  *
  ****************************************************************************/
 
-void eoss3_clockconfig(void)
+void up_timer_initialize(void)
 {
-  uint32_t clk_cfg;
-  uint8_t check_cnt;
+  uint32_t regval;
 
-  /* Enable the OSC clock source */
+  /* Configure SysTick to interrupt at the requested rate */
 
-  putreg32(AIP_OSC_CTRL_0_EN, EOSS3_AIP_OSC_CTRL_0);
+  putreg32(SYSTICK_RELOAD, NVIC_SYSTICK_RELOAD);
+  putreg32(0, NVIC_SYSTICK_CURRENT);
 
-  /* Set the frequency 79.79MHz (Update to use BOARD clock define */
+  /* Attach the timer interrupt vector */
 
-  clk_cfg = getreg32(EOSS3_AIP_OSC_CTRL_1);
-  clk_cfg &= ~AIP_OSC_CTRL_1_PROG_MASK;
-  clk_cfg |= 0x980 << AIP_OSC_CTRL_1_PROG_SHIFT;  /* (prog + 3) ∗ 32,768Hz */
-  putreg32(clk_cfg, EOSS3_AIP_OSC_CTRL_1);
+  irq_attach(EOSS3_IRQ_SYSTICK, (xcpt_t)eoss3_timerisr, NULL);
 
-  /* Wait for the lock, we need to wait for lock twice */
+  /* Enable SysTick interrupts */
 
-  /* This is disabled for the emulator to function since it does not implement
-   * the lock register and it will forever be unlocked.
-   */
+  regval = (NVIC_SYSTICK_CTRL_CLKSOURCE | NVIC_SYSTICK_CTRL_TICKINT |
+            NVIC_SYSTICK_CTRL_ENABLE);
+  putreg32(regval, NVIC_SYSTICK_CTRL);
 
-#if 1
-  for(check_cnt = 0; check_cnt < 2; check_cnt++)
-    {
-      while((getreg32(EOSS3_AIP_OSC_STA_0) & AIP_OSC_STA_0_LOCK) == 0);
-    }
-#endif
+  /* And enable the timer interrupt */
 
-  /* Need to setup M4 peripheral clocks (UART, Timer, Watchdog)
-   * CLK_SWITCH_FOR_D = 0
-   * CLK_Control_D_0 = 0x206 (divide 8 [8-2=6] + enable)
-   * MISC_LOCK_KEY_CTRL = 0x1acce551  (re-lock by writing any other val)
-   * C11_CLK_GATE = 1
-   */
-
-  putreg32(0, EOSS3_CLK_SWITCH_FOR_D);
-  putreg32((8 - 2) | (1 << 9), EOSS3_CLK_CONTROL_D_0);
-  putreg32(MISC_LOCK_KEY_CTRL_UNLOCK, MISC_LOCK_KEY_CTRL);
-  putreg32(1, EOSS3_CLK_C11_GATE);
-
-#if 0
-  /* Enable clock debug logic C11 is brought out to pad 13 */
-
-  putreg32(0, 0x40005004);
-  putreg32(1, 0x40005008);
-  putreg32(2, 0x40004c34);
-  putreg32(8, 0x40004108);
-#endif
+  up_enable_irq(EOSS3_IRQ_SYSTICK);
 }

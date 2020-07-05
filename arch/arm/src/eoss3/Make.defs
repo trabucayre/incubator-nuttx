@@ -66,5 +66,5 @@ CHIP_CSRCS += eoss3_idle.c
 endif
 
 ifneq ($(CONFIG_SCHED_TICKLESS),y)
-# CHIP_CSRCS += eoss3_timerisr.c
+CHIP_CSRCS += eoss3_timerisr.c
 endif

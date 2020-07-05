@@ -350,10 +350,6 @@ void __start(void)
 
 #warning "PLACEHOLDER FUNCTIONS HERE!!!!"
 
-/* MOVE THIS DUMMY FUNCTION TO eoss3_timerisr.c */
-
-void up_timer_initialize(void) {}
-
 /* MOVE THESE DUMMY FUNCTION TO eoss3_serial.c */
 
 int up_putc(int ch) { return 0; }
