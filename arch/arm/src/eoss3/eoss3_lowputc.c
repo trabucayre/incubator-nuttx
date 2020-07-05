@@ -39,6 +39,10 @@
  * Pre-processor Definitions
  ****************************************************************************/
 
+#define EOSS3_IOMUX_PAD_44_CTRL  (EOSS3_IO_MUX_BASE + 0x0B0)
+#define EOSS3_IOMUX_PAD_45_CTRL  (EOSS3_IO_MUX_BASE + 0x0B4)
+#define EOSS3_UART_RXD_SEL       (EOSS3_IO_MUX_BASE + 0x134)
+
 /****************************************************************************
  * Private Types
  ****************************************************************************/
@@ -103,26 +107,34 @@ void eoss3_lowsetup(void)
    * This clocking configuration should probably be configured via
    * board settings but we are hard coding it all for now.
    * 
-   * 9973760.0 * (1.0/115200) = 86.57777777777778
+   * This 16 pre-divisor does not seem to be documented, but is in the HAL
    * 
-   * int = 86
-   * frac = (86.57777777777778 - 86)*(2^6) = 37
+   * 9973760.0 / (16 * 115200) = 5.411111111111111
    * 
-   * act_div = 86 + 37 / 2^6 = 86.578125
-   * act_baud = 9973760.0 / 86.578125 = 115199
+   * int = 5
+   * frac = (5.411111111111111 - 5)*(2^6) = 26
+   * 
+   * act_div = 5 + 26 / 2^6 = 86.578125
+   * act_baud = 9973760.0 / 86.578125 = 115303
    */
 
-  putreg32(86, EOSS3_UART_IBRD);
-  putreg32(37, EOSS3_UART_FBRD);
+  putreg32(5, EOSS3_UART_IBRD);
+  putreg32(26, EOSS3_UART_FBRD);
 
   /* Configure word length 8 bit */
 
-  lcr = getreg32(EOSS3_UART_LCR_H);
-  lcr &= ~UART_LCR_H_WLEN_MASK;
-  lcr |= 0x3 << UART_LCR_H_WLEN_SHIFT;
+  putreg32(0x3 << UART_LCR_H_WLEN_SHIFT, EOSS3_UART_LCR_H);
 
   /* Enable Hardware */
 
-  putreg32(0x3 << UART_LCR_H_WLEN_SHIFT, EOSS3_UART_LCR_H);
-  putreg32(UART_CR_UARTEN | UART_CR_TXE, EOSS3_UART_CR);
+  putreg32(UART_CR_UARTEN | UART_CR_TXE | UART_CR_RXE, EOSS3_UART_CR);
+
+  /* Configure the IO pins (should this be here?)
+   * PAD-44 UART_txd Mux 3, Function A0 (0)
+   * PAD-45 UART_rxd Input [11], UART_RXD_SEL = 4
+   */
+
+  putreg32((3 << 0), EOSS3_IOMUX_PAD_44_CTRL);
+  putreg32((1 << 5) | (1 << 11), EOSS3_IOMUX_PAD_45_CTRL);
+  putreg32(4, EOSS3_UART_RXD_SEL);
 }

@@ -80,27 +80,24 @@ void eoss3_clockconfig(void)
 
   /* Enable the OSC clock source */
 
-  clk_cfg = getreg32(EOSS3_AIP_OSC_CTRL_0);
-  clk_cfg |= AIP_OSC_CTRL_0_EN;
-  putreg32(clk_cfg, EOSS3_AIP_OSC_CTRL_0);
+  putreg32(AIP_OSC_CTRL_0_EN, EOSS3_AIP_OSC_CTRL_0);
 
   /* Set the frequency 79.79MHz */
-
   clk_cfg = getreg32(EOSS3_AIP_OSC_CTRL_1);
   clk_cfg &= ~AIP_OSC_CTRL_1_PROG_MASK;
   clk_cfg |= 0x980 << AIP_OSC_CTRL_1_PROG_SHIFT;  /* (prog + 3) ∗ 32,768Hz */
   putreg32(clk_cfg, EOSS3_AIP_OSC_CTRL_1);
 
-  /* Wait for the lock, we need to wait for lock twice*/
+  /* Wait for the lock, we need to wait for lock twice */
 
   /* This is disabled for the emulator to function since it does not implement
    * the lock register and it will forever be unlocked.
    */
 
-#if 0
+#if 1
   for(check_cnt = 0; check_cnt < 2; check_cnt++)
     {
-      while(~(getreg32(EOSS3_AIP_OSC_STA_0) & AIP_OSC_STA_0_LOCK));
+      while((getreg32(EOSS3_AIP_OSC_STA_0) & AIP_OSC_STA_0_LOCK) == 0);
     }
 #endif
 
@@ -115,5 +112,13 @@ void eoss3_clockconfig(void)
   putreg32((8 - 2) | (1 << 9), EOSS3_CLK_CONTROL_D_0);
   putreg32(MISC_LOCK_KEY_CTRL_UNLOCK, MISC_LOCK_KEY_CTRL);
   putreg32(1, EOSS3_CLK_C11_GATE);
-  
+
+#if 0
+  /* Enable clock debug logic C11 is brought out to pad 13 */
+
+  putreg32(0, 0x40005004);
+  putreg32(1, 0x40005008);
+  putreg32(2, 0x40004c34);
+  putreg32(8, 0x40004108);
+#endif
 }

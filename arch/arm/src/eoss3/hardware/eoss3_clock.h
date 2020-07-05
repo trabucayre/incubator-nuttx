@@ -34,16 +34,17 @@
 
 /* Register Offsets *********************************************************/
 
-#define EOSS3_CLK_CONTROL_A_0_OFFSET    0x0004  /* Clock 10 Divisor */
-#define EOSS3_CLK_CONTROL_A_1_OFFSET    0x0008  /* Clock 10 Clock Src Ctrl */
-#define EOSS3_CLK_CONTROL_B_0_OFFSET    0x0010  /* Clock 2 Divisor */
-#define EOSS3_CLK_CONTROL_C_0_OFFSET    0x0014  /* Clock 8 Divisor */
-#define EOSS3_CLK_CONTROL_D_0_OFFSET    0x0018  /* Clock 11 Divisor */
-#define EOSS3_CLK_CONTROL_E_0_OFFSET    0x0020  /* Clock 12 Divisor */
-#define EOSS3_CLK_CONTROL_F_0_OFFSET    0x0024  /* Clock 16 Divisor */
-#define EOSS3_CLK_CONTROL_F_1_OFFSET    0x0028  /* Clock 16 Clock Src Ctrl */
-#define EOSS3_CLK_CONTROL_G_0_OFFSET    0x002c  /* Clock 30 Divisor */
-#define EOSS3_CLK_CONTROL_H_0_OFFSET    0x0034  /* Clock 19 Divisor */
+#define EOSS3_CLK_CONTROL_A_0_OFFSET    0x0000  /* Clock 10 Divisor */
+#define EOSS3_CLK_CONTROL_A_1_OFFSET    0x0004  /* Clock 10 Clock Src Ctrl */
+#define EOSS3_CLK_CONTROL_B_0_OFFSET    0x0008  /* Clock 2 Divisor */
+#define EOSS3_CLK_CONTROL_C_0_OFFSET    0x0010  /* Clock 8 Divisor */
+#define EOSS3_CLK_CONTROL_D_0_OFFSET    0x0014  /* Clock 11 Divisor */
+#define EOSS3_CLK_CONTROL_E_0_OFFSET    0x0018  /* Clock 12 Divisor */
+#define EOSS3_CLK_CONTROL_F_0_OFFSET    0x0020  /* Clock 16 Divisor */
+#define EOSS3_CLK_CONTROL_F_1_OFFSET    0x0024  /* Clock 16 Clock Src Ctrl */
+#define EOSS3_CLK_CONTROL_G_0_OFFSET    0x0028  /* Clock 30 Divisor */
+#define EOSS3_CLK_CONTROL_H_0_OFFSET    0x002c  /* Clock 19 Divisor */
+#define EOSS3_CLK_CONTROL_I_0_OFFSET    0x0034  /* Clock 21 Divisor */
 #define EOSS3_CLK_CONTROL_I_1_OFFSET    0x0038  /* Clock 21 Clock Src Ctrl */
 #define EOSS3_CLK_HS_CLK_SOURCE_OFFSET  0x003c  /* HS Clock Selection Pin */
 #define EOSS3_CLK_C01_GATE_OFFSET       0x0040  /* Clock 1 Gating Ctrl */
@@ -101,6 +102,7 @@
 #define EOSS3_CLK_CONTROL_F_1     (EOSS3_CLK_BASE + EOSS3_CLK_CONTROL_F_1_OFFSET)
 #define EOSS3_CLK_CONTROL_G_0     (EOSS3_CLK_BASE + EOSS3_CLK_CONTROL_G_0_OFFSET)
 #define EOSS3_CLK_CONTROL_H_0     (EOSS3_CLK_BASE + EOSS3_CLK_CONTROL_H_0_OFFSET)
+#define EOSS3_CLK_CONTROL_I_0     (EOSS3_CLK_BASE + EOSS3_CLK_CONTROL_I_0_OFFSET)
 #define EOSS3_CLK_CONTROL_I_1     (EOSS3_CLK_BASE + EOSS3_CLK_CONTROL_I_1_OFFSET)
 #define EOSS3_CLK_HS_CLK_SOURCE   (EOSS3_CLK_BASE + EOSS3_CLK_HS_CLK_SOURCE_OFFSET)
 #define EOSS3_CLK_C01_GATE        (EOSS3_CLK_BASE + EOSS3_CLK_C01_GATE_OFFSET)
@@ -164,7 +166,7 @@
 
 /* EOSS3_AIP_OSC_STA_0 Register */
 
-#define AIP_OSC_STA_0_LOCK            (0)
+#define AIP_OSC_STA_0_LOCK            (1 << 0)
 
 /* MISC_LOCK_KEY_CTRL Register*/
 #define MISC_LOCK_KEY_CTRL_UNLOCK     (0x1acce551)

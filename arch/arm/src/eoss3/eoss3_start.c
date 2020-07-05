@@ -265,7 +265,8 @@ void __start(void)
 
   eoss3_clockconfig();
 
-#if 0
+  /* Unclear what needs to happen here to make RENODE happy. */
+#if 1
   eoss3_fpuconfig();
 #endif
 
