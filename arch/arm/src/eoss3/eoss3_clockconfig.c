@@ -102,6 +102,12 @@ void eoss3_clockconfig(void)
     }
 #endif
 
+  /* Configure the M4 Clock. Directly connect to HFCLK for 79.79MHz */
+
+  putreg32(0, EOSS3_CLK_CONTROL_A_1);  /* Use OSC */
+  putreg32(0, EOSS3_CLK_CONTROL_A_0);  /* Disable, Output Directly */
+  putreg32(0x5f, EOSS3_CLK_C10_GATE);    /* Enable Gates [6, 4:0]
+
   /* Need to setup M4 peripheral clocks (UART, Timer, Watchdog)
    * CLK_SWITCH_FOR_D = 0
    * CLK_Control_D_0 = 0x206 (divide 8 [8-2=6] + enable)

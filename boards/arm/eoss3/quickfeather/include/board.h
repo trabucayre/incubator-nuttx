@@ -26,6 +26,9 @@
 
 #include <nuttx/config.h>
 
+#define BOARD_HCLK_FREQUENCY 79790000
+#define BOARD_CPU_FREQUENCY  79790000
+
 /* LED definitions **********************************************************/
 
 #define LED_STARTED       0  /* LED off */
