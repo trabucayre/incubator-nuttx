@@ -223,11 +223,12 @@ static void led_setonoff(unsigned int bits)
 void board_autoled_initialize(void)
 {
   /* Configure LED0-4 GPIOs for output */
-
+#if 0
   eoss3_configgpio(GPIO_LED0);
   eoss3_configgpio(GPIO_LED1);
   eoss3_configgpio(GPIO_LED2);
   eoss3_configgpio(GPIO_LED3);
+#endif
 }
 
 /****************************************************************************

@@ -17,10 +17,18 @@
  * under the License.
  ****************************************************************************/
 
+/* There are complications here that I don't fully understand.  It looks like
+ * the memory region 0x0000_0000 to 0x0000_8000 is ROM/Flash but is mirrored
+ * up to 0x2000_0000 so we need to keep the sram region outside of the
+ * mirrored code or we will run into issues.
+ */
+
 MEMORY
 {
-  flash (rx) : ORIGIN = 0x00000000, LENGTH = 2M
-  sram (rwx) : ORIGIN = 0x20000000, LENGTH = 512K
+  /* flash (rx) : ORIGIN = 0x00000000, LENGTH = 2M */
+  /* sram (rwx) : ORIGIN = 0x20000000, LENGTH = 512K */
+  flash (rx) : ORIGIN = 0x00000000, LENGTH = 0x00027000
+  sram (rwx) : ORIGIN = 0x20027000, LENGTH = 512K - 0x00027000
 }
 
 OUTPUT_ARCH(arm)

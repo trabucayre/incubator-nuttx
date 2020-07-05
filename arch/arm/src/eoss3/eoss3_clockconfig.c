@@ -76,7 +76,6 @@
 void eoss3_clockconfig(void)
 {
   uint32_t clk_cfg;
-  uint32_t clk_status;
   uint8_t check_cnt;
 
   /* Enable the OSC clock source */
@@ -92,14 +91,19 @@ void eoss3_clockconfig(void)
   clk_cfg |= 0x980 << AIP_OSC_CTRL_1_PROG_SHIFT;  /* (prog + 3) ∗ 32,768Hz */
   putreg32(clk_cfg, EOSS3_AIP_OSC_CTRL_1);
 
-  /* Wait for the lock, we need to wait for lock twice */
+  /* Wait for the lock, we need to wait for lock twice*/
 
+  /* This is disabled for the emulator to function since it does not implement
+   * the lock register and it will forever be unlocked.
+   */
+
+#if 0
   for(check_cnt = 0; check_cnt < 2; check_cnt++)
     {
       while(~(getreg32(EOSS3_AIP_OSC_STA_0) & AIP_OSC_STA_0_LOCK));
     }
+#endif
 
-  /* First get the 
   /* Need to setup M4 peripheral clocks (UART, Timer, Watchdog)
    * CLK_SWITCH_FOR_D = 0
    * CLK_Control_D_0 = 0x20E (divide 16 [16-2=e] + enable)

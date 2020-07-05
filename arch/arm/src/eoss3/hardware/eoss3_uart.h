@@ -107,16 +107,16 @@
 /* EOSS3_UART_CR Register */
 
 #define UART_CR_UARTEN            (1 << 0)
-#define UART_CR_SIREN             (1 << 0)
-#define UART_CR_SIRLP             (2 << 0)
-#define UART_CR_LBE               (7 << 0)
-#define UART_CR_TXE               (8 << 0)
-#define UART_CR_RXE               (9 << 0)
-#define UART_CR_DTR               (10 << 0)
-#define UART_CR_RTS               (11 << 0)
-#define UART_CR_OUT1              (12 << 0)
-#define UART_CR_OUT2              (13 << 0)
-#define UART_CR_RTSEN             (14 << 0)
-#define UART_CR_CTSEN             (15 << 0)
+#define UART_CR_SIREN             (1 << 1)
+#define UART_CR_SIRLP             (1 << 2)
+#define UART_CR_LBE               (1 << 7)
+#define UART_CR_TXE               (1 << 8)
+#define UART_CR_RXE               (1 << 9)
+#define UART_CR_DTR               (1 << 10)
+#define UART_CR_RTS               (1 << 11)
+#define UART_CR_OUT1              (1 << 12)
+#define UART_CR_OUT2              (1 << 13)
+#define UART_CR_RTSEN             (1 << 14)
+#define UART_CR_CTSEN             (1 << 15)
 
 #endif /* __ARCH_ARM_SRC_EOSS3_HARDWARE_EOSS3_UART_H */

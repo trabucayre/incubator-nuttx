@@ -265,7 +265,10 @@ void __start(void)
 
   eoss3_clockconfig();
 
+#if 0
   eoss3_fpuconfig();
+#endif
+
   eoss3_lowsetup();
 
   showprogress('A');
@@ -355,7 +358,3 @@ void up_timer_initialize(void) {}
 int up_putc(int ch) { return 0; }
 void arm_serialinit(void) {}
 void arm_earlyserialinit(void) {}
-
-/* MOVE THIS DUMMY FUNCTION to eoss3_clockconfig.c */
-
-void eoss3_clockconfig(void) {}

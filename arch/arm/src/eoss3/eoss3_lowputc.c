@@ -75,7 +75,7 @@ void arm_lowputc(char ch)
 {
   /* Wait until the TX data register is empty */
 
-  while ((getreg32(EOSS3_UART_TFR) & UART_TFR_BUSY) == 0);
+  while ((getreg32(EOSS3_UART_TFR) & UART_TFR_BUSY) != 0);
 
   /* Then send the character */
 
@@ -123,6 +123,6 @@ void eoss3_lowsetup(void)
 
   /* Enable Hardware */
 
-  putreg32(0x3 << UART_LCR_H_WLEN_SHIFT, EOSS3_UART_CR);
-  putreg32(UART_CR_UARTEN & UART_CR_TXE, EOSS3_UART_CR);
+  putreg32(0x3 << UART_LCR_H_WLEN_SHIFT, EOSS3_UART_LCR_H);
+  putreg32(UART_CR_UARTEN | UART_CR_TXE, EOSS3_UART_CR);
 }
