@@ -346,12 +346,3 @@ void __start(void)
   for (; ; );
 #endif
 }
-
-
-#warning "PLACEHOLDER FUNCTIONS HERE!!!!"
-
-/* MOVE THESE DUMMY FUNCTION TO eoss3_serial.c */
-
-int up_putc(int ch) { return 0; }
-void arm_serialinit(void) {}
-void arm_earlyserialinit(void) {}

@@ -58,16 +58,18 @@
 #define EOSS3_UART_FBRD           (EOSS3_UART_BASE + EOSS3_UART_FBRD_OFFSET)
 #define EOSS3_UART_LCR_H          (EOSS3_UART_BASE + EOSS3_UART_LCR_H_OFFSET)
 #define EOSS3_UART_CR             (EOSS3_UART_BASE + EOSS3_UART_CR_OFFSET)
-#define EOSS3_IFLS                (EOSS3_UART_BASE + EOSS3_IFLS_OFFSET)
-#define EOSS3_IMSC                (EOSS3_UART_BASE + EOSS3_IMSC_OFFSET)
-#define EOSS3_RIS                 (EOSS3_UART_BASE + EOSS3_RIS_OFFSET)
-#define EOSS3_MIS                 (EOSS3_UART_BASE + EOSS3_MIS_OFFSET)
-#define EOSS3_ICR                 (EOSS3_UART_BASE + EOSS3_ICR_OFFSET)
+#define EOSS3_UART_IFLS           (EOSS3_UART_BASE + EOSS3_IFLS_OFFSET)
+#define EOSS3_UART_IMSC           (EOSS3_UART_BASE + EOSS3_IMSC_OFFSET)
+#define EOSS3_UART_RIS            (EOSS3_UART_BASE + EOSS3_RIS_OFFSET)
+#define EOSS3_UART_MIS            (EOSS3_UART_BASE + EOSS3_MIS_OFFSET)
+#define EOSS3_UART_ICR            (EOSS3_UART_BASE + EOSS3_ICR_OFFSET)
 
 /* Register Bitfield Definitions ********************************************/
 
 /* EOSS3_UART_DR Register */
 
+#define UART_DR_DATA_SHIFT        (0)
+#define UART_DR_DATA_MASK         (0xff << UART_DR_DATA_SHIFT)
 #define UART_DR_FE                (1 << 8)
 #define UART_DR_PE                (1 << 9)
 #define UART_DR_BE                (1 << 10)
@@ -118,5 +120,48 @@
 #define UART_CR_OUT2              (1 << 13)
 #define UART_CR_RTSEN             (1 << 14)
 #define UART_CR_CTSEN             (1 << 15)
+
+/* EOSS3_UART_IMSC Register */
+
+#define UART_IMSC_RIMIM           (1 << 0)
+#define UART_IMSC_CTSMIM          (1 << 1)
+#define UART_IMSC_DCDMIM          (1 << 2)
+#define UART_IMSC_DSRMIM          (1 << 3)
+#define UART_IMSC_RXIM            (1 << 4)
+#define UART_IMSC_TXIM            (1 << 5)
+#define UART_IMSC_RTIM            (1 << 6)
+#define UART_IMSC_FEIM            (1 << 7)
+#define UART_IMSC_PEIM            (1 << 8)
+#define UART_IMSC_BEIM            (1 << 9)
+#define UART_IMSC_OEIM            (1 << 10)
+#define UART_IMSC_ALLINTS         (0x7ff)
+
+/* EOSS3_UART_IMSC Register */
+
+#define UART_MIS_RIMMIS           (1 << 0)
+#define UART_MIS_CTSMMIS          (1 << 1)
+#define UART_MIS_DCDMMIS          (1 << 2)
+#define UART_MIS_DSRMMIS          (1 << 3)
+#define UART_MIS_RXMIS            (1 << 4)
+#define UART_MIS_TXMIS            (1 << 5)
+#define UART_MIS_RTMIS            (1 << 6)
+#define UART_MIS_FEMIS            (1 << 7)
+#define UART_MIS_PEMIS            (1 << 8)
+#define UART_MIS_BEMIS            (1 << 9)
+#define UART_MIS_OEMIS            (1 << 10)
+
+/* EOSS3_UART_ICR Register */
+
+#define UART_ICR_RIMIC           (1 << 0)
+#define UART_ICR_CTSMIC          (1 << 1)
+#define UART_ICR_DCDMIC          (1 << 2)
+#define UART_ICR_DSRMIC          (1 << 3)
+#define UART_ICR_RXIC            (1 << 4)
+#define UART_ICR_TXIC            (1 << 5)
+#define UART_ICR_RTIC            (1 << 6)
+#define UART_ICR_FEIC            (1 << 7)
+#define UART_ICR_PEIC            (1 << 8)
+#define UART_ICR_BEIC            (1 << 9)
+#define UART_ICR_OEIC            (1 << 10)
 
 #endif /* __ARCH_ARM_SRC_EOSS3_HARDWARE_EOSS3_UART_H */

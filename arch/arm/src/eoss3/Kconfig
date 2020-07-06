@@ -10,7 +10,6 @@ menu "EOS S3 Peripheral Support"
 config EOSS3_UART
 	bool "UART"
 	default n
-	---help---
-		Support UART
+	select UART_SERIALDRIVER
 
 endmenu
