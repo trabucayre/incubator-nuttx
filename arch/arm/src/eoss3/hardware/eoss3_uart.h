@@ -42,12 +42,12 @@
 #define EOSS3_UART_FBRD_OFFSET    0x0028  /* Fractional Baud Rate Divisor */
 #define EOSS3_UART_LCR_H_OFFSET   0x002c  /* UART Line Control Register */
 #define EOSS3_UART_CR_OFFSET      0x0030  /* UART Control Register */
-#define EOSS3_IFLS_OFFSET         0x0034  /* Interrupt FIFO Level Select */
-#define EOSS3_IMSC_OFFSET         0x0038  /* Interrupt Mask Set/Clear */
-#define EOSS3_RIS_OFFSET          0x003c  /* Raw Interrupt Status Register */
-#define EOSS3_MIS_OFFSET          0x0040  /* Masked Interrupt Status */
-#define EOSS3_ICR_OFFSET          0x0044  /* Interrupt Clear Register */
-
+#define EOSS3_UART_IFLS_OFFSET    0x0034  /* Interrupt FIFO Level Select */
+#define EOSS3_UART_IMSC_OFFSET    0x0038  /* Interrupt Mask Set/Clear */
+#define EOSS3_UART_RIS_OFFSET     0x003c  /* Raw Interrupt Status Register */
+#define EOSS3_UART_MIS_OFFSET     0x0040  /* Masked Interrupt Status */
+#define EOSS3_UART_ICR_OFFSET     0x0044  /* Interrupt Clear Register */
+ 
 /* Register Addresses *******************************************************/
 
 #define EOSS3_UART_DR             (EOSS3_UART_BASE + EOSS3_UART_DR_OFFSET)
@@ -58,11 +58,11 @@
 #define EOSS3_UART_FBRD           (EOSS3_UART_BASE + EOSS3_UART_FBRD_OFFSET)
 #define EOSS3_UART_LCR_H          (EOSS3_UART_BASE + EOSS3_UART_LCR_H_OFFSET)
 #define EOSS3_UART_CR             (EOSS3_UART_BASE + EOSS3_UART_CR_OFFSET)
-#define EOSS3_UART_IFLS           (EOSS3_UART_BASE + EOSS3_IFLS_OFFSET)
-#define EOSS3_UART_IMSC           (EOSS3_UART_BASE + EOSS3_IMSC_OFFSET)
-#define EOSS3_UART_RIS            (EOSS3_UART_BASE + EOSS3_RIS_OFFSET)
-#define EOSS3_UART_MIS            (EOSS3_UART_BASE + EOSS3_MIS_OFFSET)
-#define EOSS3_UART_ICR            (EOSS3_UART_BASE + EOSS3_ICR_OFFSET)
+#define EOSS3_UART_IFLS           (EOSS3_UART_BASE + EOSS3_UART_IFLS_OFFSET)
+#define EOSS3_UART_IMSC           (EOSS3_UART_BASE + EOSS3_UART_IMSC_OFFSET)
+#define EOSS3_UART_RIS            (EOSS3_UART_BASE + EOSS3_UART_RIS_OFFSET)
+#define EOSS3_UART_MIS            (EOSS3_UART_BASE + EOSS3_UART_MIS_OFFSET)
+#define EOSS3_UART_ICR            (EOSS3_UART_BASE + EOSS3_UART_ICR_OFFSET)
 
 /* Register Bitfield Definitions ********************************************/
 

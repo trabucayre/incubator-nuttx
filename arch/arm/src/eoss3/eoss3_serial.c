@@ -49,6 +49,7 @@
 #include "arm_internal.h"
 
 #include "hardware/eoss3_uart.h"
+#include "hardware/eoss3_intr.h"
 #include "eoss3_lowputc.h"
 
 #ifdef USE_SERIALDRIVER
@@ -239,8 +240,12 @@ static void eoss3_shutdown(struct uart_dev_s *dev)
 static int eoss3_attach(struct uart_dev_s *dev)
 {
   int ret;
+  uint32_t intrc;
+  uint32_t m4_intrc;
 
   /* Attach and enable the IRQ */
+
+
 
   ret = irq_attach(EOSS3_IRQ_UART, eoss3_interrupt, dev);
   if (ret == OK)
@@ -248,7 +253,11 @@ static int eoss3_attach(struct uart_dev_s *dev)
       /* Enable the interrupt (RX and TX interrupts are still disabled
        * in the UART
        */
-
+      putreg32(INTR_UART_DET, EOSS3_INTR_OTHER);
+      putreg32(UART_IMSC_ALLINTS, EOSS3_UART_ICR);
+      m4_intrc = getreg32(EOSS3_INTR_OTHER_EN_M4);
+      m4_intrc |= INTR_UART_EN_M4;
+      putreg32(m4_intrc, EOSS3_INTR_OTHER_EN_M4);
       up_enable_irq(EOSS3_IRQ_UART);
     }
 
@@ -300,9 +309,22 @@ static int eoss3_interrupt(int irq, void *context, FAR void *arg)
 
       status  = getreg32(EOSS3_UART_MIS);
 
+      /* If no interrupts remaining break */
+
+      if (status == 0)
+        {
+          putreg32(0x7ff, EOSS3_UART_ICR);
+          break;
+        }
+
       /* Handle incoming, receive bytes */
 
       if (status & UART_MIS_RXMIS)
+        {
+          uart_recvchars(dev);
+        }
+  
+      if (status & UART_MIS_RTMIS)
         {
           uart_recvchars(dev);
         }
@@ -315,6 +337,7 @@ static int eoss3_interrupt(int irq, void *context, FAR void *arg)
         }
     }
 
+  putreg32(INTR_UART_DET, EOSS3_INTR_OTHER);
   return OK;
 }
 
@@ -393,12 +416,12 @@ static void eoss3_rxint(struct uart_dev_s *dev, bool enable)
   if (enable)
     {
 #ifndef CONFIG_SUPPRESS_SERIAL_INTS
-      priv->ie |= UART_IMSC_RXIM;
+      priv->ie |= (UART_IMSC_RXIM | UART_IMSC_RTIM);
 #endif
     }
   else
     {
-      priv->ie &= ~UART_IMSC_RXIM;
+      priv->ie &= ~(UART_IMSC_RXIM | UART_IMSC_RTIM);
     }
 
   putreg32(priv->ie, EOSS3_UART_IMSC);
@@ -414,7 +437,7 @@ static void eoss3_rxint(struct uart_dev_s *dev, bool enable)
 
 static bool eoss3_rxavailable(struct uart_dev_s *dev)
 {
-  return ((getreg32(EOSS3_UART_TFR) & UART_TFR_RXFE) != 0);
+  return ((getreg32(EOSS3_UART_TFR) & UART_TFR_RXFE) == 0);
 }
 
 /****************************************************************************
@@ -440,16 +463,11 @@ static void eoss3_send(struct uart_dev_s *dev, int ch)
 
 static void eoss3_txint(struct uart_dev_s *dev, bool enable)
 {
-  struct eoss3_uart_s *priv = (struct eoss3_uart_s *)dev->priv;
-  irqstate_t flags;
-
   /* Enable interrupt for TX complete */
 
-  flags = enter_critical_section();
   if (enable)
     {
 #ifndef CONFIG_SUPPRESS_SERIAL_INTS
-      priv->ie |= UART_IMSC_TXIM;
 
       /* It is not clear to me that we can get an interrupt on empty, so
        * we fake it here :/
@@ -457,13 +475,6 @@ static void eoss3_txint(struct uart_dev_s *dev, bool enable)
       uart_xmitchars(dev);
 #endif
     }
-  else
-    {
-      priv->ie &= ~UART_IMSC_TXIM;
-    }
-
-  putreg32(priv->ie, EOSS3_UART_IMSC);
-  leave_critical_section(flags);
 }
 
 /****************************************************************************
@@ -476,6 +487,10 @@ static void eoss3_txint(struct uart_dev_s *dev, bool enable)
 
 static bool eoss3_txready(struct uart_dev_s *dev)
 {
+  /* HACK this forces the FIFO to never be full so we can get the data out */
+
+  while((getreg32(EOSS3_UART_TFR) & UART_TFR_TXFF) != 0);
+
   return ((getreg32(EOSS3_UART_TFR) & UART_TFR_TXFF) == 0);
 }
 
