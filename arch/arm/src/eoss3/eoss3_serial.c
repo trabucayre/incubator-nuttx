@@ -363,7 +363,7 @@ static int eoss3_ioctl(struct file *filep, int cmd, unsigned long arg)
 #ifdef CONFIG_SERIAL_TIOCSERGSTRUCT
     case TIOCSERGSTRUCT:
       {
-         struct imxrt_uart_s *user = (struct eoss3_uart_s *)arg;
+         struct eoss3_uart_s *user = (struct eoss3_uart_s *)arg;
          if (!user)
            {
              ret = -EINVAL;
